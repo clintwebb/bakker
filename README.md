@@ -10,6 +10,15 @@ Main Goals:
 * reverse incremental (the latest backup is a full backup, and can be restored in a single go).
    * on the target device, hardlinks will be used for files that haven't changed
    * new copies stored for files that have changed.
+* lvm snapshots
+   * Will put service in maintenance mode
+   * do database backup
+   * do local lvm snapshot
+   * take it out of maintenance
+   * Then do incremental backup of the snapshot volume
+   * and when completed, remove the snapshot.
+This means nextcloud does not need to be in maintenance mode for long.
+
 * encryption (before delivered to storage)
 * isolation
    * even though the storage service might have content from multiple servers, each different server cannot see the content from the other servers.
@@ -36,3 +45,5 @@ Example.
 12. Each file in the new directory will be a hard-link to the previous file (if it hadn't changed), or a new copy of a file (if it did change).
     * This means that if we only want to keep 14 days of backups, we can simply delete the directory (and impl file) for the directory with the date older than 14 days.  It would have no impact on the latest (or other incremental) folders.
 13. on the backup server, it might have some configuration that it knows how much to retain and delete automatically.   It could mean, keep content at least 14 days, and at least 7 instances.  Which means if it was intented to be done daily, it would keep 14 days.  But it it only ran randomly, it would keep at least 7 incrementals.
+
+
