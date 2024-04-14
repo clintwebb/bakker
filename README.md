@@ -17,8 +17,8 @@ Main Goals:
    * take it out of maintenance
    * Then do incremental backup of the snapshot volume
    * and when completed, remove the snapshot.
-This means nextcloud does not need to be in maintenance mode for long.
-
+   * _This means nextcloud does not need to be in maintenance mode for long._
+* storage server can allocate specific space (LV's) for each device.  ie, the source server might have 10GB space allocated, and once filled will not increase.  Some other options could be implemented to make this flexible (like the source can request an increase)...
 * encryption (before delivered to storage)
 * isolation
    * even though the storage service might have content from multiple servers, each different server cannot see the content from the other servers.
