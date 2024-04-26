@@ -4,7 +4,7 @@ Tool for backups
 The main purpose is for a simplified backups solution with almost no backup service other than storage, the majority of everything is done on the server itself with an agent which can be triggered.
 
 Main Goals:
-* a simplified backups solution with almost no backup service other than storage
+* a simplified backups solution with almost no backup service other than storage (but can provide additional functionality)
 * the majority of everything is done on the server itself with an agent which can be triggered.
 * configuration for the agent can be on the storage location (or a controlling service), but doesn't have to be.
 * reverse incremental (the latest backup is a full backup, and can be restored in a single go).
