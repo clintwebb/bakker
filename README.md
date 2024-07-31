@@ -30,6 +30,10 @@ Main Goals:
 * merging... if we have daily backups, over a year that would result in 365 incrementals.  If we want to keep the last 14 days incrementals, and then keep one combined incremental each month, and then one yearly for 4 years.   Each incremental deleted would be fine.  The `impl` file will contain some history (if requested), but most of it will only be the information about the file system at that current moment.  THe incremental folder actually has ALL the files for that run, it just has LOTS that are hardlinked in other incrementals.
 * Include functionality to also deliver (and maintain) backups in cloud resources (like AWS S3 Glacier)
    * should have functionality to not include every backup, but monthly backups, etc... 
+* To reduce space taken with backups,
+   * can implement a diff solution, but this will add complexity, especially with recovery.
+   * can implement compressing the backup into a single (or set of) compressed files.  ie, combine all the files into single (or small number of) files when being deployed to cloud-storage.
+
 
 Example.
 1. We have a server that is just for storage of the backup data.  Lets call it `storage1`.
