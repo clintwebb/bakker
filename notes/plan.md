@@ -25,7 +25,7 @@ flowchart TD;
     FUNC_UNMAINT(Out of Maint. Mode) -->
     FUNC_LVM_BAK(Incremental backup of Snapshot Volume) -->
     FUNC_UN_SNAP(Remove Snapshot) -->
-    FEAT_LVM_SNAP[LVM Snapshots] --> TARG_FINAL
+    FEAT_LVM_SNAP[<a href='https://github.com/clintwebb/bakker/blob/main/notes/lvm_snapshots.md'>LVM Snapshots</a>] --> TARG_FINAL
 
     FEAT_ENCRYPT[Encryption] --> TARG_FINAL
     
