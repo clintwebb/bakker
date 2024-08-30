@@ -1,1 +1,1 @@
-* [Plan](notes/plan.md)
+* [Plan](./plan.md)
