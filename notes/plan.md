@@ -25,16 +25,16 @@ flowchart TD;
 
     FEAT_CONFIG[Config File] -->
 
-    FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARG_LOCAL
+    FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARGET
 
-    FEAT_LOCAL_RECOVER[Local Recovery] --> TARG_LOCAL
+    FEAT_LOCAL_RECOVER[Local Recovery] --> TARGET
     FEAT_CONFIG --> FEAT_LOCAL_RECOVER
 
-    FEAT_MERGE[Merge] --> TARG_LOCAL
+    FEAT_MERGE[Merge] --> TARGET
     FEAT_CONFIG --> FEAT_MERGE
 
-    TARG_LOCAL[["`**Local**`"]]
-    style TARG_LOCAL fill:#faf
+    TARGET[["`**Local**`"]]
+    style TARGET fill:#faf
 ```
 ## Diff
 ```mermaid
@@ -45,8 +45,10 @@ flowchart TD;
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
 
-    FEAT_DIFF_RECOVER[Diff Recovery] --> TARG_DIFF
-    TARG_DIFF[["`**Diff**`"]]
+    FEAT_DIFF[Diff Implement] -->
+    FEAT_DIFF_RECOVER[Diff Recovery] -->
+    TARGET[["`**Diff**`"]]
+    style TARGET fill:#faf
 ```
 ## Compress
 ```mermaid
@@ -57,8 +59,10 @@ flowchart TD;
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
 
-    FEAT_COMP_RECOVER[Compress Recovery] --> TARG_COMPRESS
-    TARG_COMPRESS[["`**Compress**`"]]
+    FEAT_COMPRESS[Compress] -->
+    FEAT_COMP_RECOVER[Compress Recovery] -->
+    TARGET[["`**Compress**`"]]
+    style TARGET fill:#faf
 ```
 ## Remote
 ```mermaid
@@ -69,11 +73,22 @@ flowchart TD;
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
 
-    FEAT_LV_EACH[Storage LV for each device] --> TARG_REMOTE
-    FEAT_REMOTE_CLEAN[Clean old backups on Remote] --> TARG_REMOTE
-    FEAT_REMOTE_RECOVER[REmote REcovery] --> TARG_REMOTE
-    FEAT_ISOLATION[Isolation] --> TARG_REMOTE
-    TARG_REMOTE[["`**Store Remote**`"]]
+    FUNC_LV_EACH(Storage LV for each device) -->
+
+    FEAT_ACCOUNT_SETUP[Account Setup on Remote Storage] -->
+    FEAT_ACCOUNT_SRC[Account setup in config on source] -->
+    FEAT_TRANSFER_REMOTE[Transfer Remote]  -->
+    FEAT_REMOTE_CLEAN[Clean old backups on Remote] --> TARGET
+
+    FEAT_REMOTE_RECOVER[Remote Recovery] --> TARGET
+    FEAT_TRANSFER_REMOTE --> FEAT_REMOTE_RECOVER
+
+    %% Ensure different accounts have no ability to access resources from other accounts.
+    FUNC_ISOLATION(Isolation) --> TARGET
+
+    TARGET[["`**Store Remote**`"]]
+    style TARGET fill:#faf
+
 ```
 ## Cloud
 ```mermaid
@@ -84,9 +99,14 @@ flowchart TD;
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
 
-    FEAT_CLOUD_RECOVER[Cloud Recovery] --> TARG_CLOUD
-    FEAT_PERIODIC[Periodic] --> TARG_CLOUD
-    TARG_CLOUD[["`**Store in Cloud**`"]]
+    FEAT_CLOUD_TRANSFER[Cloud Transfer] -->
+    FEAT_CLOUD_RECOVER[Cloud Recovery] --> TARGET
+
+    %% merging... if we have daily backups, over a year that would result in 365 incrementals.  If we want to keep the last 14 days incrementals, and then keep one combined incremental each month, and then one yearly for 4 years.   Each incremental deleted would be fine.  The `impl` file will contain some history (if requested), but most of it will only be the information about the file system at that current moment.  THe incremental folder actually has ALL the files for that run, it just has LOTS that are hardlinked in other incrementals.
+    FEAT_PERIODIC[Periodic Merge and Clean] -->
+
+    TARGET[["`**Store in Cloud**`"]]
+    style TARGET fill:#faf
 ```
 ## Final
 ```mermaid
@@ -103,9 +123,9 @@ flowchart TD;
     FUNC_UNMAINT(Out of Maint. Mode) -->
     FUNC_LVM_BAK(Incremental backup of Snapshot Volume) -->
     FUNC_UN_SNAP(Remove Snapshot) -->
-    FEAT_LVM_SNAP[<a href='https://github.com/clintwebb/bakker/blob/main/notes/lvm_snapshots.md'>LVM Snapshots</a>] --> TARG_FINAL
+    FEAT_LVM_SNAP[<a href='https://github.com/clintwebb/bakker/blob/main/notes/lvm_snapshots.md'>LVM Snapshots</a>] --> TARGET
 
-    FEAT_ENCRYPT[Encryption] --> TARG_FINAL
-    TARG_FINAL[["`**Final**`"]]
-    
+    FEAT_ENCRYPT[Encryption] --> TARGET
+    TARGET[["`**Final**`"]]
+    style TARGET fill:#faf
 ```
