@@ -39,11 +39,16 @@ flowchart TD;
 ## Diff
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
+
+    %% Completed (#afa)
+
+    %% Active (#aaf)
 
     FEAT_DIFF[Diff Implement] -->
     FEAT_DIFF_RECOVER[Diff Recovery] -->
@@ -53,11 +58,16 @@ flowchart TD;
 ## Compress
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
+
+    %% Completed (#afa)
+
+    %% Active (#aaf)
 
     FEAT_COMPRESS[Compress] -->
     FEAT_COMP_RECOVER[Compress Recovery] -->
@@ -67,11 +77,16 @@ flowchart TD;
 ## Remote
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
+
+    %% Completed (#afa)
+
+    %% Active (#aaf)
 
     FUNC_LV_EACH(Storage LV for each device) -->
 
@@ -93,11 +108,16 @@ flowchart TD;
 ## Cloud
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
+
+    %% Completed (#afa)
+
+    %% Active (#aaf)
 
     FEAT_CLOUD_TRANSFER[Cloud Transfer] -->
     FEAT_CLOUD_RECOVER[Cloud Recovery] --> TARGET
@@ -111,21 +131,29 @@ flowchart TD;
 ## Final
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
 
-    FUNC_MAINT(Services in Maint. Mode) -->
-    FUNC_LVM_SNAP(LVM Snapshots) -->
-    FUNC_DB_BAK(DB Backup) -->
-    FUNC_UNMAINT(Out of Maint. Mode) -->
-    FUNC_LVM_BAK(Incremental backup of Snapshot Volume) -->
-    FUNC_UN_SNAP(Remove Snapshot) -->
-    FEAT_LVM_SNAP[<a href='https://github.com/clintwebb/bakker/blob/main/notes/lvm_snapshots.md'>LVM Snapshots</a>] --> TARGET
+    %% Completed (#afa)
+
+    %% Active (#aaf)
+
+    subgraph LVM_SNAPSHOT[LVM SNAPSHOT]
+        FUNC_MAINT(Services in Maint. Mode) -->
+        FUNC_LVM_SNAP(LVM Snapshots) -->
+        FUNC_DB_BAK(DB Backup) -->
+        FUNC_UNMAINT(Out of Maint. Mode) -->
+        FUNC_LVM_BAK(Incremental backup of Snapshot Volume) -->
+        FUNC_UN_SNAP(Remove Snapshot)
+    end
+    LVM_SNAPSHOT --> TARGET
 
     FEAT_ENCRYPT[Encryption] --> TARGET
+
     TARGET[["`**Final**`"]]
     style TARGET fill:#faf
 ```
