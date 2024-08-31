@@ -142,7 +142,7 @@ flowchart TD;
 
     %% Active (#aaf)
 
-    subgraph LVM_SNAPSHOT[LVM SNAPSHOT]
+    subgraph LVM_SNAPSHOT["`**LVM SNAPSHOT**`"]
         FUNC_MAINT(Services in Maint. Mode) -->
         FUNC_LVM_SNAP(LVM Snapshots) -->
         FUNC_DB_BAK(DB Backup) -->
