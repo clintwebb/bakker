@@ -62,35 +62,33 @@ if [[ $1 == "process" ]]; then
   echo "${xNameHash} ${XX}" >> $BAKKER_NEW/.bakker_t
   xNEW=(${xNameHash} ${XX})
 
-
-  if [[ -L $xFILE ]]; then
-    cp -d "$xFILE" "$BAKKER_NEW/$xFILE"
-  elif [[ -d $xFILE ]]; then
-    mkdir -p $BAKKER_NEW/$xFILE
-  else
-
-    if [[ -n $BAKKER_CURRENT ]]; then
-#     echo "Current Exists: $BAKKER_CURRENT"
-      xOLD=($(grep -E "^${xNameHash} " $BAKKER_CURRENT/.bakker_t))
-#       echo "NEW: ${xNEW[@]}"
-#       echo "OLD: ${xOLD[@]}"
-
-      if [[ ${xOLD[9]} -ne ${xNEW[9]} ]] || [[ ${xOLD[7]} -ne ${xNEW[7]} ]]; then
-        # The file has changed
-#         echo "File Changed: $xFILE"
-        cp -v "$xFILE" "$BAKKER_NEW/$xFILE"
-      else
-#         echo "NOT CHANGED: $xFILE"
-        cp -l "$BAKKER_CURRENT/$xFILE" "$BAKKER_NEW/$xFILE"
-      fi
-
+  if [[ -n $BAKKER_LOCAL ]]; then
+    if [[ -L $xFILE ]]; then
+      cp -d "$xFILE" "$BAKKER_NEW/$xFILE"
+    elif [[ -d $xFILE ]]; then
+      mkdir -p $BAKKER_NEW/$xFILE
     else
-#       echo "No Current"
-      cp "$xFILE" "$BAKKER_NEW/$xFILE"
-    fi
-  fi
-  # local xFileHash=$(sha256sum "${xFILE}"|awk '{print $1}')
 
+      if [[ -n $BAKKER_CURRENT ]]; then
+        xOLD=($(grep -E "^${xNameHash} " $BAKKER_CURRENT/.bakker_t))
+
+        if [[ ${xOLD[9]} -ne ${xNEW[9]} ]] || [[ ${xOLD[7]} -ne ${xNEW[7]} ]]; then
+          cp -v "$xFILE" "$BAKKER_NEW/$xFILE"
+        else
+          cp -l "$BAKKER_CURRENT/$xFILE" "$BAKKER_NEW/$xFILE"
+        fi
+
+      else
+        cp "$xFILE" "$BAKKER_NEW/$xFILE"
+      fi
+    fi
+    # local xFileHash=$(sha256sum "${xFILE}"|awk '{print $1}')
+  fi
+
+  #
+  if [[ -n $BAKKER_REMOTE ]]; then
+    echo "Remote"
+  fi
 
 #   if [ $(( var1 & 0x3 )) -eq $(( 0x2 )) ]; then
 #   if (( (var1 & 0x3) == 0x2 )); then
@@ -110,18 +108,18 @@ if [[ $1 == "process" ]]; then
 # S_ISUID    0004000   set UID bit
 # S_ISGID    0002000   set-group-ID bit (see below)
 # S_ISVTX    0001000   sticky bit (see below)
-# S_IRWXU    00700     mask for file owner permissions
-# S_IRUSR    00400     owner has read permission
-# S_IWUSR    00200     owner has write permission
-# S_IXUSR    00100     owner has execute permission
-# S_IRWXG    00070     mask for group permissions
-# S_IRGRP    00040     group has read permission
-# S_IWGRP    00020     group has write permission
-# S_IXGRP    00010     group has execute permission
-# S_IRWXO    00007     mask for permissions for others (not in group)
-# S_IROTH    00004     others have read permission
-# S_IWOTH    00002     others have write permission
-# S_IXOTH    00001     others have execute permission
+# S_IRWXU    0000700   mask for file owner permissions
+# S_IRUSR    0000400   owner has read permission
+# S_IWUSR    0000200   owner has write permission
+# S_IXUSR    0000100   owner has execute permission
+# S_IRWXG    0000070   mask for group permissions
+# S_IRGRP    0000040   group has read permission
+# S_IWGRP    0000020   group has write permission
+# S_IXGRP    0000010   group has execute permission
+# S_IRWXO    0000007   mask for permissions for others (not in group)
+# S_IROTH    0000004   others have read permission
+# S_IWOTH    0000002   others have write permission
+# S_IXOTH    0000001   others have execute permission
 
 
 
@@ -139,94 +137,98 @@ declare -a BAKKER_DIRS
 
 # ------------------------------------------------------------------------------------------------------------------
 
-  while [[ -n $1 ]]; do
+while [[ -n $1 ]]; do
 
-    # If the paramters are done like --hostname="fred" then we want to handle that.
-    # We also want to handle it if they done like --hostname fred.
-    if [[ $1 == *=* ]]; then
-      IFS='='; TT=($1); unset IFS;
-      ONE=${TT[0]}
-      TWO=${TT[1]}
-    else
-      ONE=$1
-      TWO=$2
-      shift
-    fi
-
-    case $ONE in
-      --env|--config)    BAKKER_CONFIG=$(nextvar $ONE $TWO)  || exit $? ;;
-
-      --follow)          BAKKER_FOLLOW=$(nextbool $ONE $TWO) || exit $? ;;
-      --diff)            BAKKER_DIFF=$(nextbool $ONE $TWO)   || exit $? ;;
-
-      --local)           BAKKER_LOCAL=$(nextvar $ONE $TWO)   || exit $? ;;
-      --remote)          BAKKER_REMOTE=$(nextvar $ONE $TWO)  || exit $? ;;
-
-      --dir|--directory) BAKKER_DIRS+=($(nextvar $ONE $TWO)) || exit $? ;;
-
-      *)
-        >&2 echo "Unknown Parameter: $1"
-        >&2 echo "Exiting."
-        sleep 1
-        exit 1
-        ;;
-    esac
-    shift
-  done
-
-  # If this is run as 'root' account, we look for a config file at the root level.
-  # If a regular user account, look for a config file in their home folder.
-  # If it a service account, look for config in /etc/bakker.d/
-  if [[ -n $BAKKER_CONFIG ]]; then
-    if [[ -e $BAKKER_CONFIG ]]; then
-      source $BAKKER_CONFIG
-    else
-      >&2 echo "Unable to load specified config file: $BAKKER_CONFIG"
-      sleep 1
-      exit 1
-    fi
+  # If the paramters are done like --hostname="fred" then we want to handle that.
+  # We also want to handle it if they done like --hostname fred.
+  if [[ $1 == *=* ]]; then
+    IFS='='; TT=($1); unset IFS;
+    ONE=${TT[0]}
+    TWO=${TT[1]}
   else
-    if [[ $UID -eq 0 ]]; then
-      test -e /etc/bakker.conf && source $_
-    else
-      test -e /home/$USER/.bakker/bakker.conf && source $_
-      test -e /etc/bakker.d/$USER.conf && source $_
-    fi
+    ONE=$1
+    TWO=$2
+    shift
   fi
 
-  if [[ -z $BAKKER_DIRS ]] || [[ ${#BAKKER_DIRS[@]} -le 0 ]]; then
-    >&2 echo "No Source Directories specified"
+  case $ONE in
+    --env|--config)    BAKKER_CONFIG=$(nextvar $ONE $TWO)    || exit $? ;;
+
+    --follow)          BAKKER_FOLLOW=$(nextbool $ONE $TWO)   || exit $? ;;
+    --diff)            BAKKER_DIFF=$(nextbool $ONE $TWO)     || exit $? ;;
+    --compress)        BAKKER_COMPRESS=$(nextbool $ONE $TWO) || exit $? ;;
+
+    --local)           BAKKER_LOCAL=$(nextvar $ONE $TWO)     || exit $? ;;
+    --remote)          BAKKER_REMOTE=$(nextvar $ONE $TWO)    || exit $? ;;
+
+    --dir|--directory) BAKKER_DIRS+=($(nextvar $ONE $TWO))   || exit $? ;;
+
+    *)
+      >&2 echo "Unknown Parameter: $1"
+      >&2 echo "Exiting."
+      sleep 1
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# If this is run as 'root' account, we look for a config file at the root level.
+# If a regular user account, look for a config file in their home folder.
+# If it a service account, look for config in /etc/bakker.d/
+if [[ -n $BAKKER_CONFIG ]]; then
+  if [[ -e $BAKKER_CONFIG ]]; then
+    source $BAKKER_CONFIG
+  else
+    >&2 echo "Unable to load specified config file: $BAKKER_CONFIG"
     sleep 1
     exit 1
   fi
-
-
-  # Check the local target directory
-  if [[ -n $BAKKER_LOCAL ]]; then
-    test -d $BAKKER_LOCAL || mkdir -vp $BAKKER_LOCAL
-    export BAKKER_LOCAL
-
-    # need to find the appropriate location to store the backups
-    CC=0
-    DD=$(date +%F)
-    FF="${DD}.`printf '%04d\n' ${CC}`"
-    while [[ -d $BAKKER_LOCAL/$FF ]]; do
-      ((CC++))
-      FF="${DD}.`printf '%04d\n' ${CC}`"
-    done
-    export BAKKER_NEW="$BAKKER_LOCAL/$FF"
-    echo "NEW: $BAKKER_NEW"
-    mkdir $BAKKER_NEW
-
-    # Check previous backup (current)
-    if [[ -L $BAKKER_LOCAL/current ]]; then
-      export BAKKER_CURRENT=$BAKKER_LOCAL/current
-    fi
+else
+  if [[ $UID -eq 0 ]]; then
+    test -e /etc/bakker.conf && source $_
+  else
+    test -e /home/$USER/.bakker/bakker.conf && source $_
+    test -e /etc/bakker.d/$USER.conf && source $_
   fi
+fi
 
-  for DD in ${BAKKER_DIRS[@]}; do
-    find -L $DD -exec $0 process '{}' \;
+if [[ -z $BAKKER_DIRS ]] || [[ ${#BAKKER_DIRS[@]} -le 0 ]]; then
+  >&2 echo "No Source Directories specified"
+  sleep 1
+  exit 1
+fi
+
+
+# Check the local target directory
+if [[ -n $BAKKER_LOCAL ]]; then
+  test -d $BAKKER_LOCAL || mkdir -vp $BAKKER_LOCAL
+  export BAKKER_LOCAL
+
+  # need to find the appropriate location to store the backups
+  CC=0
+  DD=$(date +%F)
+  FF="${DD}.$(printf '%04d\n' ${CC})"
+  while [[ -d $BAKKER_LOCAL/$FF ]]; do
+    ((CC++))
+    FF="${DD}.$(printf '%04d\n' ${CC})"
   done
+  export BAKKER_NEW="$BAKKER_LOCAL/$FF"
+  echo "NEW: $BAKKER_NEW"
+  mkdir $BAKKER_NEW
 
-#   echo "  ln -sf \"${FF}\" $BAKKER_LOCAL/current"
-  ln -sfn "${FF}" $BAKKER_LOCAL/current
+
+  # Check previous backup (current)
+  if [[ -L $BAKKER_LOCAL/current ]]; then
+    export BAKKER_CURRENT=$BAKKER_LOCAL/current
+  fi
+fi
+
+[[ -n $BAKKER_COMPRESS ]] && export BAKKER_COMPRESS
+[[ -n $BAKKER_DIFF ]]     && export BAKKER_DIFF
+
+for DD in ${BAKKER_DIRS[@]}; do
+  find -L $DD -exec $0 process '{}' \;
+done
+
+ln -sfn "${FF}" $BAKKER_LOCAL/current

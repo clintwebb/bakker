@@ -2,17 +2,39 @@
 Local Backup. although not very likely to be commonly used (as backups should be stored somewhere else), it is something that is used in some circumstances.  It also is the first phase to test some initial functionality.
 ```mermaid
 flowchart TD;
-    %% To mark an item as completed (green)
+    %% To mark an item as completed (afa=green, faf=purple, aaf=blue)
     %% style EXAMPLE fill:#afa
 
     %% To provide a link
     %% A[<a href='https://google.com'>works</a>]
+    %%--------------
+
+    %% Completed (#afa)
+    style FEAT_INIT fill:#afa
+    style FUNC_HASH fill:#afa
+    style FUNC_PROCESS fill:#afa
+
+    %% Active (#aaf)
+    style FEAT_CONFIG fill:#aaf
+
+    FUNC_HASH(Get Hash,Info of file to process) -->
+    FUNC_PROCESS(Initial Process) -->
+
+    %% Init Script that can handle the basics of local backups.
+    FEAT_INIT[Initial Script] --> FEAT_CONFIG
+
+    FEAT_CONFIG[Config File] -->
 
     FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARG_LOCAL
-    FEAT_LOCAL_RECOVER[Local Recovery] --> TARG_LOCAL
-    FEAT_MERGE[Merge] --> TARG_LOCAL
-    TARG_LOCAL[["`**Local**`"]]
 
+    FEAT_LOCAL_RECOVER[Local Recovery] --> TARG_LOCAL
+    FEAT_CONFIG --> FEAT_LOCAL_RECOVER
+
+    FEAT_MERGE[Merge] --> TARG_LOCAL
+    FEAT_CONFIG --> FEAT_MERGE
+
+    TARG_LOCAL[["`**Local**`"]]
+    style TARG_LOCAL fill:#faf
 ```
 ## Diff
 ```mermaid
