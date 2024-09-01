@@ -10,14 +10,15 @@ Main Goals:
 * reverse incremental (the latest backup is a full backup, and can be restored in a single go).
    * on the target device, hardlinks will be used for files that haven't changed
    * new copies stored for files that have changed.
-* lvm snapshots
-   * Will put service in maintenance mode
-   * do database backup
-   * do local lvm snapshot
-   * take it out of maintenance
-   * Then do incremental backup of the snapshot volume
-   * and when completed, remove the snapshot.
-   * _as an example, This means nextcloud does not need to be in maintenance mode for long._
+* [Triggers](./triggers.md)
+   * _Example: lvm snapshots_
+      * Will put service in maintenance mode
+      * do database backup
+      * do local lvm snapshot
+      * take it out of maintenance
+      * Then do incremental backup of the snapshot volume
+      * and when completed, remove the snapshot.
+      * _as an example, This means nextcloud does not need to be in maintenance mode for long._
 * local hard-link backups.  In addition to sending backups to remote server for storage, it can also do hard-link backups locally (on the same volume) which can assist with lock backup copies, which can be retained at different levels.  Therefore it can be a local backup copy, as well as a remote backup copy.
 * Remote backup can be compressed to reduce space (but is recommended at the 3rd level).
 * THe local and remote backups can contain the full filesystem with hard-links so that it can be recovered pretty much instantly.. but can also have a diff folder which only contains hardlinks to versions of te files that have changed.  This can also be used for other incremental backups.  ie, when zipping up and sending to another external source, dont need to include the bits that have not changed.

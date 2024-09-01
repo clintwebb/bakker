@@ -13,9 +13,10 @@ flowchart TD;
     style FEAT_INIT fill:#afa
     style FUNC_HASH fill:#afa
     style FUNC_PROCESS fill:#afa
+    style FEAT_CONFIG fill:#afa
 
     %% Active (#aaf)
-    style FEAT_CONFIG fill:#aaf
+    style FEAT_TRIGGER fill:#aaf
 
     FUNC_HASH(Get Hash,Info of file to process) -->
     FUNC_PROCESS(Initial Process) -->
@@ -24,14 +25,12 @@ flowchart TD;
     FEAT_INIT[Initial Script] --> FEAT_CONFIG
 
     FEAT_CONFIG[Config File] -->
-
     FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARGET
+    FEAT_CONFIG --> FEAT_LOCAL_RECOVER[Local Recovery] --> TARGET
+    FEAT_CONFIG --> FEAT_MERGE[Merge] --> TARGET
 
-    FEAT_LOCAL_RECOVER[Local Recovery] --> TARGET
-    FEAT_CONFIG --> FEAT_LOCAL_RECOVER
-
-    FEAT_MERGE[Merge] --> TARGET
-    FEAT_CONFIG --> FEAT_MERGE
+    %% Trigger is the ability to perform some actions when triggering the backup.
+    FEAT_CONFIG --> FEAT_TRIGGER[Trigger] --> TARGET
 
     TARGET[["`**Local**`"]]
     style TARGET fill:#faf
@@ -150,7 +149,7 @@ flowchart TD;
         FUNC_LVM_BAK(Incremental backup of Snapshot Volume) -->
         FUNC_UN_SNAP(Remove Snapshot)
     end
-    LVM_SNAPSHOT --> TARGET
+    FEAT_TRIGGER{Trigger} --> LVM_SNAPSHOT --> TARGET
 
     FEAT_ENCRYPT[Encryption] --> TARGET
 
