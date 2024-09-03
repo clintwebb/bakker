@@ -15,3 +15,7 @@ Like:
 3. Put the service back in normal mode.
 
 Some of the questions might be, would it be better to just trigger all that before the backup begins?  Although possible, also No.. because we want the service to be in maintenance mode for as short as possible, and there can be situations where multiple steps need to be made.
+
+### Expected Solution
+
+Currently using a bash script to perform this, so what a method to store the information in a way that can be easily processed.
