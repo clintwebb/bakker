@@ -24,6 +24,10 @@ flowchart TD;
     %% Init Script that can handle the basics of local backups.
     FEAT_INIT[Initial Script] --> FEAT_CONFIG
 
+    FEAT_CONF_DIRLIST(Config Dir List) --> FEAT_CONFIG
+
+
+
     FEAT_CONFIG[Config File] -->
     FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARGET
     FEAT_CONFIG --> FEAT_LOCAL_RECOVER[Local Recovery] --> TARGET
