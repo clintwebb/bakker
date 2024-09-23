@@ -14,6 +14,7 @@ flowchart TD;
     style FUNC_HASH fill:#afa
     style FUNC_PROCESS fill:#afa
     style FEAT_CONFIG fill:#afa
+    style FEAT_CONF_DIRLIST fill:#afa
 
     %% Active (#aaf)
     style FEAT_TRIGGER fill:#aaf
@@ -25,8 +26,7 @@ flowchart TD;
     FEAT_INIT[Initial Script] --> FEAT_CONFIG
 
     FEAT_CONF_DIRLIST(Config Dir List) --> FEAT_CONFIG
-
-
+    FEAT_ID_HARDLINKS[Identify Hardlinks] --> TARGET
 
     FEAT_CONFIG[Config File] -->
     FEAT_LOCAL_CLEAN[Clean old backups on Local] --> TARGET
@@ -35,6 +35,10 @@ flowchart TD;
 
     %% Trigger is the ability to perform some actions when triggering the backup.
     FEAT_CONFIG --> FEAT_TRIGGER[Trigger] --> TARGET
+
+    FEAT_PUSHD[Pushd start dir] --> FEAT_CONFIG
+    FEAT_FOLLOW[Follow] --> TARGET
+
 
     TARGET[["`**Local**`"]]
     style TARGET fill:#faf

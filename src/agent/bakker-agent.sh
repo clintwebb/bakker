@@ -178,7 +178,14 @@ done
 # If it a service account, look for config in /etc/bakker.d/
 if [[ -n $BAKKER_CONFIG ]]; then
   if [[ -e $BAKKER_CONFIG ]]; then
-    source $BAKKER_CONFIG
+    if [[ -d $BAKKER_CONFIG ]]; then
+      # A directory was specified, so load all *.conf files in that directory
+      for II in $BAKKER_CONFIG/*.conf; do
+        [[ -f $II ]] && source $II
+      done
+    else
+      source $BAKKER_CONFIG
+    fi
   else
     >&2 echo "Unable to load specified config file: $BAKKER_CONFIG"
     sleep 1
@@ -193,12 +200,20 @@ else
   fi
 fi
 
+
 if [[ -z $BAKKER_DIRS ]] || [[ ${#BAKKER_DIRS[@]} -le 0 ]]; then
   >&2 echo "No Source Directories specified"
   sleep 1
   exit 1
 fi
 
+if [[ -n $BAKKER_PUSHD ]]; then
+  pushd $BAKKER_PUSHD
+  if [[ $? -ne 0 ]]; then
+    echo "Unable to switch to: $BAKKER_PUSHD"
+    exit 1
+  fi
+fi
 
 # Check the local target directory
 if [[ -n $BAKKER_LOCAL ]]; then
@@ -232,3 +247,7 @@ for DD in ${BAKKER_DIRS[@]}; do
 done
 
 ln -sfn "${FF}" $BAKKER_LOCAL/current
+
+if [[ -n $BAKKER_PUSHD ]]; then
+  popd
+fi

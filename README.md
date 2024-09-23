@@ -58,4 +58,5 @@ Example.
     * know how much to retain and delete automatically.   It could mean, keep content at least 14 days, and at least 7 instances.  Which means if it was intented to be done daily, it would keep 14 days.  But it it only ran randomly, it would keep at least 7 incrementals.
     * Keep a certain number of recent daily backups, but also keep monthly backups, and yearly backups.   
 
-
+Triggers:
+1. When a backup is configured, we might have multiple directories, including sub-dirs.  We might also have an exclusion list.
