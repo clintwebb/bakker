@@ -70,12 +70,30 @@ if [[ $1 == "process" ]]; then
     else
 
       if [[ -n $BAKKER_CURRENT ]]; then
-        xOLD=($(grep -E "^${xNameHash} " $BAKKER_CURRENT/.bakker_t))
 
-        if [[ ${xOLD[9]} -ne ${xNEW[9]} ]] || [[ ${xOLD[7]} -ne ${xNEW[7]} ]]; then
-          cp -v "$xFILE" "$BAKKER_NEW/$xFILE"
-        else
-          cp -l "$BAKKER_CURRENT/$xFILE" "$BAKKER_NEW/$xFILE"
+        #### CHECK if file is hardlinked to other file..
+        nHARDLINKED=0
+
+        if [[ ${xNEW[6]} -gt 1 ]]; then
+          # If the source file is hardlinked to another file, check if we already have that file backed up.  If so, hardlink to it.
+          # Could do this multiple ways, but using a 'while' loop even though we will loop only once.
+          while read LINE; do
+            xCHK=($LINE);
+            cp -v -l "$BAKKER_NEW/${xCHK[11]}" "$BAKKER_NEW/$xFILE";
+            nHARDLINKED=1;
+            break;
+          done < <(grep -E "^\\S+\\s+(${xNEW[1]})" $BAKKER_NEW/.bakker_t | grep -v $xNameHash)
+        fi
+
+        # If we did hardlink it, we dont need to do anything else with the file.
+        if [[ $nHARDLINKED -eq 0 ]]; then
+          xOLD=($(grep -E "^${xNameHash} " $BAKKER_CURRENT/.bakker_t))
+
+          if [[ ${xOLD[9]} -ne ${xNEW[9]} ]] || [[ ${xOLD[7]} -ne ${xNEW[7]} ]]; then
+            cp -v "$xFILE" "$BAKKER_NEW/$xFILE"
+          else
+            cp -l "$BAKKER_CURRENT/$xFILE" "$BAKKER_NEW/$xFILE"
+          fi
         fi
 
       else
@@ -153,6 +171,7 @@ while [[ -n $1 ]]; do
 
   case $ONE in
     --env|--config)    BAKKER_CONFIG=$(nextvar $ONE $TWO)    || exit $? ;;
+    --pushd)           BAKKER_PUSHD=$(nextvar $ONE $TWO)    || exit $? ;;
 
     --follow)          BAKKER_FOLLOW=$(nextbool $ONE $TWO)   || exit $? ;;
     --diff)            BAKKER_DIFF=$(nextbool $ONE $TWO)     || exit $? ;;

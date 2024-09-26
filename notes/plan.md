@@ -15,6 +15,7 @@ flowchart TD;
     style FUNC_PROCESS fill:#afa
     style FEAT_CONFIG fill:#afa
     style FEAT_CONF_DIRLIST fill:#afa
+    style FEAT_ID_HARDLINKS fill:#afa
 
     %% Active (#aaf)
     style FEAT_TRIGGER fill:#aaf
